@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
+    <title>Comentários</title>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#root',
+
+            template: `
+                <div class="container">
+                    <h1 class="title">Comentários</h1>
+
+                    <form class="form" v-on:submit.prevent="handleSubmit">
+                        <div class="field">
+                            <label class="label">Usuário</label>
+                            <div class="control">
+                                <input
+                                    class="input"
+                                    type="text"
+                                    placeholder="Seu nome"
+                                    v-model="user"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label class="label">Comentário</label>
+                            <div class="control">
+                                <input
+                                    class="input"
+                                    type="text"
+                                    placeholder="Deixe um comentário"
+                                    v-model="comment"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <div class="control">
+                                <button class="button is-success">Comentar</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <hr />
+
+                    <div class="container" v-for="(comment, index) in comments">
+                        <div class="card has-background-white-ter">
+                            <div class="card-content">
+                                <div class="content">
+                                    <section class="container">
+                                        <div class="hero">
+                                            <strong>Autor:</strong>
+                                            <span>{{comment.user}}</span>
+                                        </div>
+                        
+                                        <div class="hero">
+                                            <strong>Comentário:</strong>
+                                            <span>{{comment.comment}}</span>
+                                        </div>
+                                    </section>
+
+                                    <button
+                                        type="button"
+                                        class="button is-danger is-small"
+                                        v-on:click="handleCommentDelete(index)"
+                                    >
+                                        Excluir comentário
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr />
+                    </div>
+                </div>
+            `,
+
+            data() {
+                const storageComments = this.handleGetFromStorage();
+
+                return {
+                    comments: storageComments,
+                    user: '',
+                    comment: '',
+                };
+            },
+
+            methods: {
+                handleSubmit() {
+                   if (this.user.trim() === '' || this.comment.trim() === '') return;
+
+                   this.comments.unshift({
+                       user: this.user,
+                       comment: this.comment,
+                   });
+
+                   this.user = '';
+                   this.comment= '';
+
+                   this.handleSaveToStorage();
+                },
+
+                handleCommentDelete(commentIndex) {
+                    this.comments.splice(commentIndex, 1);
+
+                    this.handleSaveToStorage();
+                },
+
+                handleSaveToStorage() {
+                    localStorage.setItem('comments', JSON.stringify(this.comments));
+                },
+
+                handleGetFromStorage() {
+                    const comments = JSON.parse(localStorage.getItem('comments'));
+
+                    return comments;
+                }
+            },
+        });
+    </script>
+</body>
+</html>
