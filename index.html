@@ -52,7 +52,7 @@
 
                     <hr />
 
-                    <div class="container" v-for="(comment, index) in comments">
+                    <div class="container" v-for="(comment, index) in allComments">
                         <div class="card has-background-white-ter">
                             <div class="card-content">
                                 <div class="content">
@@ -96,7 +96,7 @@
 
             methods: {
                 handleSubmit() {
-                   if (this.user.trim() === '' || this.comment.trim() === '') return;
+                   if (this.comment.trim() === '') return;
 
                    this.comments.unshift({
                        user: this.user,
@@ -105,14 +105,10 @@
 
                    this.user = '';
                    this.comment= '';
-
-                   this.handleSaveToStorage();
                 },
 
                 handleCommentDelete(commentIndex) {
                     this.comments.splice(commentIndex, 1);
-
-                    this.handleSaveToStorage();
                 },
 
                 handleSaveToStorage() {
@@ -123,6 +119,21 @@
                     const comments = JSON.parse(localStorage.getItem('comments'));
 
                     return comments;
+                }
+            },
+
+            computed: {
+                allComments() {
+                    return this.comments.map(comment => ({
+                        ...comment,
+                        user: comment.user.trim() === '' ? 'Anônimo' : comment.user,
+                    }));
+                }
+            },
+
+            watch: {
+                comments() {
+                    this.handleSaveToStorage();
                 }
             },
         });
